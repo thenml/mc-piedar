@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>mc 26.2 piedar calculator</title>
+	<link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+	<canvas id="grid"></canvas>
+
+	<div id="bar">
+		<span>
+			<button onclick="reset()">reset</button>
+		</span>
+		<span>
+			<span>rd:</span>
+			<input id="rd" type="range" min="2" max="32" value="32">
+			<span id="rdVal">32</span>
+		</span>
+		<span>
+			<span>
+				<input id="ring" type="checkbox" onchange="state.ring ^= 1; draw()"></input>
+				ring
+			</span>
+			<span>
+				<input id="text" type="checkbox" checked onchange="state.text ^= 1; draw()"></input>
+				text
+			</span>
+		</span>
+		<span>
+			<span>in rd:</span>
+			<button onclick="setChecking(1)">yes</button>
+			<button onclick="setChecking(-1)">no</button>
+		</span>
+		<span class="br"></span>
+		<span>use rd yes / no to note when a BE is in render</span>
+		<span>controls: arrows, wasd, +/-, lmb, rmb, [, ]</span>
+		<span>
+			<select name="theme" id="theme">
+				<option value="purple">purple</option>
+				<option value="water">water</option>
+				<option value="solar">solar</option>
+				<option value="gray">gray</option>
+			</select>
+		</span>
+		<span>
+			<button onclick="chopdar()">chopdar (WIP)</button>
+		</span>
+	</div>
+
+
+	<script src="alg.js"></script>
+	<script src="themes.js"></script>
+	<script src="visualizer.js"></script>
+</body>
+
+</html>

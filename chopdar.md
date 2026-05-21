@@ -1,0 +1,23 @@
+- go to a chunk corner
+- find rd-1 (tip: increase chunks by 4 and decrease by 1)
+- move forwards:
+    - if yes -> its forward
+    - if no -> increase rd by 1
+        - if yes -> its centered left/right
+        - if no -> its backward
+        - do not decrease rd
+    - go back
+- go right:
+    - if was forward:
+        - if yes -> its forward-right
+        - if no:
+            - increase rd by 1
+            - if yes -> its straight forward
+            - if no -> its forward-left
+  
+    - if was backwards or centered:
+        - if no -> its +left
+        - if yes:
+            - decrease rd by 1
+            - if yes -> its +right
+            - if no -> its straight back
