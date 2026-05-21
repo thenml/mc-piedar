@@ -291,7 +291,7 @@ window.addEventListener("keydown", e => {
 		draw();
 	} else if (e.key === "[") setChecking(-1);
 	else if (e.key === "]") setChecking(1);
-	else if (e.key === " ") console.log(find());
+	else if (e.key === " ") chopdar();
 });
 
 canvas.addEventListener("contextmenu", e => e.preventDefault());

@@ -1,3 +1,5 @@
+// an attempt to solve the piedar problem
+
 // from minecraft code (js-ified)
 function check(x, z, radius) {
 	const bufferRange = 2;
@@ -13,7 +15,7 @@ let debug = false;
 function find() {
 	timecost = 0;
 	state.rd = 1;
-	const dir = dirV4();
+	const dir = dirV5();
 	draw();
 	return { dir, timecost, correct: realDirections[state.px + "," + state.pz] };
 }
@@ -23,11 +25,9 @@ function chopdar() {
 		alert("select a point first (click on the map!)");
 		return;
 	}
-	timecost = 0;
-	state.rd = 1;
 	state.maybe = [];
 	if (debug) draw();
-	const dir = dirV4();
+	const { dir } = find();
 	state.arrow = dir;
 	rdInput.value = state.rd;
 	rdVal.innerHTML = state.rd;
@@ -97,61 +97,9 @@ const move = {
 	},
 };
 
-function dirV0(check) {
-	const stepNorth = rd => check(0, -1, rd);
-	const stepSouth = rd => check(0, 1, rd);
-	const stepEast = rd => check(1, 0, rd);
-	const stepWest = rd => check(-1, 0, rd);
-	const center = rd => check(0, 0, rd);
-
-	let high = 1;
-	while (!center(high)) {
-		high *= 2;
-	}
-
-	let low = 0;
-	let baseR = high;
-	while (low <= high) {
-		let mid = Math.floor((low + high) / 2);
-		if (center(mid)) {
-			baseR = mid;
-			high = mid - 1;
-		} else {
-			low = mid + 1;
-		}
-	}
-
-	const strictR = baseR - 1;
-
-	const getScore = movePointer => {
-		if (movePointer(strictR)) {
-			return 1;
-		}
-
-		if (movePointer(strictR + 1)) {
-			return 2;
-		}
-
-		return 3;
-	};
-
-	const scoreN = getScore(stepNorth);
-	const scoreS = getScore(stepSouth);
-	const scoreE = getScore(stepEast);
-	const scoreW = getScore(stepWest);
-
-	let direction = "";
-
-	if (scoreN < scoreS) direction += "N";
-	if (scoreS < scoreN) direction += "S";
-
-	if (scoreE < scoreW) direction += "E";
-	if (scoreW < scoreE) direction += "W";
-
-	return direction !== "" ? direction : "Center";
-}
-function dirV4() {
-	// find radius
+/** complex but 100% accurate */
+// similar to standard 1.16.1 piedar
+function dirV5() {
 	let high = 1;
 	let rd = 1;
 
@@ -161,7 +109,6 @@ function dirV4() {
 			move.rd(high);
 			if (move.check()) break;
 		}
-
 		let low = Math.floor(high / 4) + 1;
 		rd = high;
 		while (low <= high) {
@@ -175,43 +122,57 @@ function dirV4() {
 			}
 		}
 	}
+
 	rd -= 1;
 	if (rd < 2) return "Center";
+
+	// algorithm begins
 	move.rd(rd);
 
 	move.n();
-	let isFWD = move.check();
-	let isBCK = !isFWD;
+	let n1 = move.check();
 
-	if (!isFWD) {
-		move.rd(rd + 1);
-		isBCK = !move.check();
-	}
-	move.s();
 	move.e();
-	let isRIGHT = false;
-	let isLEFT = false;
+	let ne1 = move.check();
 
-	if (isFWD) {
-		isRIGHT = move.check();
-		if (!isRIGHT) {
-			move.rd(rd + 1);
-			isLEFT = !move.check();
-		}
+	move.s();
+	let e1 = move.check();
+
+	let n2 = n1,
+		ne2 = ne1,
+		e2 = e1;
+
+	if (!e1 || !ne1 || !n1) {
+		move.rd(rd + 1);
+		if (!e1) e2 = move.check();
+
+		move.n();
+		if (!ne1) ne2 = move.check();
+
+		move.w();
+		if (!n1) n2 = move.check();
+
+		move.s();
 	} else {
-		let checkNormal = move.check();
-		if (!checkNormal) {
-			isLEFT = true;
-		} else {
-			move.rd(rd);
-			isRIGHT = move.check();
-			move.rd(rd + 1);
-		}
+		move.w();
 	}
-	move.w();
 
-	let dirZ = isFWD ? "N" : isBCK ? "S" : "";
-	let dirX = isRIGHT ? "E" : isLEFT ? "W" : "";
+	let sN = n1 ? 1 : n2 ? 2 : 3;
+	let sE = e1 ? 1 : e2 ? 2 : 3;
+	let sNE = ne1 ? 1 : ne2 ? 2 : 3;
+
+	let dirZ = sN === 1 ? "N" : sN === 3 ? "S" : "";
+	let dirX = sE === 1 ? "E" : sE === 3 ? "W" : "";
+
+	// tie breakers
+	if (sN === 2 && sE === 2 && sNE === 1) {
+		dirZ = "N";
+		dirX = "E";
+	} else if (sN === 2 && sE === 3 && sNE === 2) {
+		dirZ = "N";
+	} else if (sN === 3 && sE === 2 && sNE === 2) {
+		dirX = "E";
+	}
 
 	return dirZ + dirX || "Center";
 }
