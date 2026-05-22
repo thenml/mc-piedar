@@ -33,7 +33,7 @@ function resize() {
 	canvas.width = cssSize * dpr;
 	canvas.height = cssSize * dpr;
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
-	cell = cssSize / size;
+	cell = cssSize / size * dpr;
 }
 
 resize();
